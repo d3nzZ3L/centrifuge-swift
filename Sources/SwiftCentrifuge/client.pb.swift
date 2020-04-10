@@ -364,6 +364,8 @@ struct Proto_ConnectRequest {
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
+  var subs: [Proto_SubscribeRequest] = []
+    
   init() {}
 }
 
@@ -384,6 +386,8 @@ struct Proto_ConnectResult {
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
+  var subs: [Proto_SubscribeRequest] = []
+    
   init() {}
 }
 
@@ -639,6 +643,8 @@ struct Proto_RPCRequest {
   // methods supported on all messages.
 
   var data: Data = SwiftProtobuf.Internal.emptyData
+    
+    var method: String = String()
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -1219,6 +1225,7 @@ extension Proto_ConnectRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "token"),
     2: .same(proto: "data"),
+    3: .same(proto: "subs")
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1226,6 +1233,7 @@ extension Proto_ConnectRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
       switch fieldNumber {
       case 1: try decoder.decodeSingularStringField(value: &self.token)
       case 2: try decoder.decodeSingularBytesField(value: &self.data)
+      case 3: try decoder.decodeRepeatedMessageField(value: &self.subs)
       default: break
       }
     }
@@ -1238,12 +1246,16 @@ extension Proto_ConnectRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
     if !self.data.isEmpty {
       try visitor.visitSingularBytesField(value: self.data, fieldNumber: 2)
     }
+    if !self.subs.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.subs, fieldNumber: 3)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: Proto_ConnectRequest, rhs: Proto_ConnectRequest) -> Bool {
     if lhs.token != rhs.token {return false}
     if lhs.data != rhs.data {return false}
+    if lhs.subs != rhs.subs {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -1257,6 +1269,7 @@ extension Proto_ConnectResult: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
     3: .same(proto: "expires"),
     4: .same(proto: "ttl"),
     5: .same(proto: "data"),
+    6: .same(proto: "subs"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1267,6 +1280,7 @@ extension Proto_ConnectResult: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
       case 3: try decoder.decodeSingularBoolField(value: &self.expires)
       case 4: try decoder.decodeSingularUInt32Field(value: &self.ttl)
       case 5: try decoder.decodeSingularBytesField(value: &self.data)
+      case 6: try decoder.decodeRepeatedMessageField(value: &self.subs)
       default: break
       }
     }
@@ -1288,6 +1302,9 @@ extension Proto_ConnectResult: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
     if !self.data.isEmpty {
       try visitor.visitSingularBytesField(value: self.data, fieldNumber: 5)
     }
+    if !self.subs.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.subs, fieldNumber: 6)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1297,6 +1314,7 @@ extension Proto_ConnectResult: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
     if lhs.expires != rhs.expires {return false}
     if lhs.ttl != rhs.ttl {return false}
     if lhs.data != rhs.data {return false}
+    if lhs.subs != rhs.subs {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -1902,12 +1920,14 @@ extension Proto_RPCRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
   static let protoMessageName: String = _protobuf_package + ".RPCRequest"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "data"),
+    2: .same(proto: "method"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       switch fieldNumber {
       case 1: try decoder.decodeSingularBytesField(value: &self.data)
+      case 2: try decoder.decodeSingularStringField(value: &self.method)
       default: break
       }
     }
@@ -1916,12 +1936,14 @@ extension Proto_RPCRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImpleme
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.data.isEmpty {
       try visitor.visitSingularBytesField(value: self.data, fieldNumber: 1)
+      try visitor.visitSingularStringField(value: self.method, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: Proto_RPCRequest, rhs: Proto_RPCRequest) -> Bool {
     if lhs.data != rhs.data {return false}
+    if lhs.method != rhs.method {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

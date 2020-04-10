@@ -23,17 +23,20 @@ public class CentrifugeSubscription {
     private var isResubscribe = false
     private var needResubscribe = true
     
-    weak var delegate: CentrifugeSubscriptionDelegate?
+    public weak var delegate: CentrifugeSubscriptionDelegate?
     
     private var callbacks: [String: ((Error?) -> ())] = [:]
     private let syncQueue: DispatchQueue
     private weak var centrifuge: CentrifugeClient?
     
-    init(centrifuge: CentrifugeClient, channel: String, delegate: CentrifugeSubscriptionDelegate) {
+    init(centrifuge: CentrifugeClient, channel: String, delegate: CentrifugeSubscriptionDelegate?, subscribeOnServer: Bool = false) {
         self.centrifuge = centrifuge
         self.channel = channel
         self.delegate = delegate
         self.isResubscribe = false
+        if subscribeOnServer {
+            self.status = .subscribeSuccess
+        }
         self.syncQueue = DispatchQueue(label: "com.centrifugal.centrifuge-swift.sync<\(UUID().uuidString)>")
     }
     

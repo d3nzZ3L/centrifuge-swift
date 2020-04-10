@@ -231,6 +231,18 @@ public class CentrifugeClient {
         self.subscriptions.append(sub)
         return sub
     }
+    
+    /**
+     Try to get Subscription from internal client registry. Can return nil if Subscription
+     does not exist yet.
+     - parameter channel: String
+     - returns: CentrifugeSubscription?
+     */
+    public func getSubscription(channel: String) -> CentrifugeSubscription? {
+        defer { subscriptionsLock.unlock() }
+        subscriptionsLock.lock()
+        return self.subscriptions.first(where: { $0.channel == channel })
+    }
 }
 
 internal extension CentrifugeClient {
@@ -371,6 +383,13 @@ fileprivate extension CentrifugeClient {
                     strongSelf.status = .connected
                     strongSelf.numReconnectAttempts = 0
                     strongSelf.client = result.client
+                    for sub in result.subs {
+                        let subscription = CentrifugeSubscription(centrifuge: strongSelf, channel: sub.channel, delegate: nil, subscribeOnServer: true)
+                        //subscription.unsubscribeOnDisconnect()
+                        strongSelf.subscriptionsLock.lock()
+                        strongSelf.subscriptions.append(subscription)
+                        strongSelf.subscriptionsLock.unlock()
+                    }
                     strongSelf.delegateQueue.addOperation { [weak self] in
                         guard let strongSelf = self else { return }
                         strongSelf.delegate?.onConnect(strongSelf, CentrifugeConnectEvent(client: result.client))
