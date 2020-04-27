@@ -61,7 +61,7 @@ public class CentrifugeClient {
     fileprivate var pingTimer: DispatchSourceTimer?
     fileprivate var disconnectOpts: CentrifugeDisconnectOptions?
     fileprivate var refreshTask: DispatchWorkItem?
-    fileprivate var connecting = false
+    var connecting = false
     
     /// Initialize client.
     ///
