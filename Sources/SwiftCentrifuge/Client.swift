@@ -226,7 +226,7 @@ public class CentrifugeClient {
     public func newSubscription(channel: String, delegate: CentrifugeSubscriptionDelegate) throws -> CentrifugeSubscription {
         defer { subscriptionsLock.unlock() }
         subscriptionsLock.lock()
-        guard self.subscriptions.filter({ $0.channel == channel }).count == 0 else { throw CentrifugeError.duplicateSub }
+        removeSubcription(channel: channel)
         let sub = CentrifugeSubscription(centrifuge: self, channel: channel, delegate: delegate)
         self.subscriptions.append(sub)
         return sub
@@ -280,12 +280,8 @@ internal extension CentrifugeClient {
             guard let strongSelf = self else { return }
             if strongSelf.status == .connected {
                 guard let strongSelf = self else { return }
-                strongSelf.sendUnsubscribe(channel: channel, completion: {[weak self] (res, error) in
+                strongSelf.sendUnsubscribe(channel: channel, completion: {(res, error) in
                     // Nothing to do here, we unsubscribed anyway.
-                    guard let `self` = self else { return }
-                    self.subscriptionsLock.lock()
-                    self.subscriptions.removeAll(where: {$0.channel == channel})
-                    self.subscriptionsLock.unlock()
                 })
             }
         }
@@ -330,6 +326,9 @@ internal extension CentrifugeClient {
     func close(reason: String, reconnect: Bool) {
         self.disconnectOpts = CentrifugeDisconnectOptions(reason: reason, reconnect: reconnect)
         self.conn?.disconnect()
+        if (reconnect == true) {
+            connect()
+        }
     }
 }
 
@@ -982,5 +981,10 @@ fileprivate extension CentrifugeClient {
         } catch {
             completion(error)
         }
+    }
+    
+    private func removeSubcription(channel: String) {
+        subscriptions.filter({$0.channel == channel }).forEach({$0.unsubscribe()})
+        subscriptions.removeAll(where: {$0.channel == channel})
     }
 }
