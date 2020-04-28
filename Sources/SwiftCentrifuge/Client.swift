@@ -280,8 +280,12 @@ internal extension CentrifugeClient {
             guard let strongSelf = self else { return }
             if strongSelf.status == .connected {
                 guard let strongSelf = self else { return }
-                strongSelf.sendUnsubscribe(channel: channel, completion: { res, error in
+                strongSelf.sendUnsubscribe(channel: channel, completion: {[weak self] (res, error) in
                     // Nothing to do here, we unsubscribed anyway.
+                    guard let `self` = self else { return }
+                    self.subscriptionsLock.lock()
+                    self.subscriptions.removeAll(where: {$0.channel == channel})
+                    self.subscriptionsLock.unlock()
                 })
             }
         }
