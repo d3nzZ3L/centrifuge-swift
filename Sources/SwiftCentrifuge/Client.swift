@@ -23,9 +23,9 @@ public struct CentrifugeClientConfig {
     public var debug = false
     public var headers = [String:String]()
     public var tlsSkipVerify = false
-    public var maxReconnectDelay = 20.0
+    public var maxReconnectDelay = 5.0
     public var privateChannelPrefix = "$"
-    public var pingInterval = 25.0
+    public var pingInterval = 15.0
     
     public init() {}
 }
@@ -500,9 +500,9 @@ fileprivate extension CentrifugeClient {
             guard let strongSelf = self else { return }
             strongSelf.connecting = true
             // TODO: add jitter here
-            let delay = min(pow(Double(strongSelf.numReconnectAttempts), 2), strongSelf.config.maxReconnectDelay)
+            let delay = strongSelf.config.maxReconnectDelay
             strongSelf.numReconnectAttempts += 1
-            strongSelf.syncQueue.asyncAfter(deadline: .now() +  delay, execute: { [weak self] in
+            strongSelf.syncQueue.asyncAfter(deadline: .now() + delay, execute: { [weak self] in
                 guard let strongSelf = self else { return }
                 strongSelf.syncQueue.async { [weak self] in
                     guard let strongSelf = self else { return }
