@@ -98,9 +98,9 @@ public class CentrifugeSubscription {
                 switch err {
                 case CentrifugeError.replyError(let code, let message):
                     guard code == 100 else { // Internal error
-                        centrifuge.syncQueue.async { [weak centrifuge = centrifuge] in
-                            centrifuge?.close(reason: "internal error", reconnect: true)
-                        }
+//                        centrifuge.syncQueue.async { [weak centrifuge = centrifuge] in
+//                            centrifuge?.close(reason: "internal error", reconnect: true)
+//                        }
                         return
                     }
                     self?.syncQueue.async { [weak self] in
