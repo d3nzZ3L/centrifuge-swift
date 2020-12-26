@@ -46,7 +46,7 @@ public class CentrifugeClient {
     fileprivate(set) var config: CentrifugeClientConfig
     
     //MARK -
-    fileprivate(set) var status: CentrifugeClientStatus = .new
+    public var status: CentrifugeClientStatus = .new
     fileprivate var conn: WebSocket?
     fileprivate var token: String?
     fileprivate var client: String?
@@ -270,15 +270,13 @@ internal extension CentrifugeClient {
             guard let strongSelf = self else { return }
             strongSelf.token = token
             strongSelf.sendRefresh(token: token, completion: { result, error in
-                if let _ = error {
-                    strongSelf.close(reason: "refresh error", reconnect: true)
+                guard error == nil else {
+                    strongSelf.close(reason: "refresh error", reconnect: false)
                     strongSelf.delegate?.onRefreshError(strongSelf, error)
                     return
                 }
-                if let res = result {
-                    if res.expires {
-                        strongSelf.startConnectionRefresh(ttl: res.ttl)
-                    }
+                if let result = result, result.expires {
+                    strongSelf.startConnectionRefresh(ttl: result.ttl)
                 }
             })
         }
@@ -381,7 +379,8 @@ fileprivate extension CentrifugeClient {
                         if code == 109 {
                             strongSelf.delegateQueue.addOperation { [weak self] in
                                 guard let strongSelf = self else { return }
-                                strongSelf.delegate?.onRefresh(strongSelf, CentrifugeRefreshEvent()) {[weak self] token in
+                                let reason = CentrifugeRefreshEvent(code: code, message: message)
+                                strongSelf.delegate?.onRefresh(strongSelf, reason) { [weak self] token in
                                     guard let strongSelf = self else { return }
                                     if token != "" {
                                         strongSelf.token = token

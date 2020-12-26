@@ -17,7 +17,20 @@ public struct CentrifugeDisconnectEvent{
     public var reconnect: Bool
 }
 
-public struct CentrifugeRefreshEvent{}
+public struct CentrifugeRefreshEvent{
+    public var code: UInt32
+    public var message: String
+    
+    init() {
+        code = 1812
+        message = "Non error event"
+    }
+    
+    init(code: UInt32, message: String) {
+        self.code = code
+        self.message = message
+    }
+}
 
 public struct CentrifugeJoinEvent {
     public var client: String
