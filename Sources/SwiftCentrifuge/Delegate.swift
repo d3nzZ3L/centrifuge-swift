@@ -66,7 +66,7 @@ public protocol CentrifugeClientDelegate: class {
     func onPrivateSub(_ client: CentrifugeClient, _ event: CentrifugePrivateSubEvent, completion: @escaping (_ token: String) -> ())
     func onRefresh(_ client: CentrifugeClient, _ event: CentrifugeRefreshEvent, completion: @escaping (_ token: String) -> ())
     func onMessage(_ client: CentrifugeClient, _ event: CentrifugeMessageEvent)
-    func onRefreshError(_ client: CentrifugeClient, _ error: Error)
+    func onRefreshError(_ client: CentrifugeClient, _ error: Error?)
 }
 
 public extension CentrifugeClientDelegate {
@@ -79,7 +79,7 @@ public extension CentrifugeClientDelegate {
         completion("")
     }
     func onMessage(_ client: CentrifugeClient, _ event: CentrifugeMessageEvent) {}
-    func onRefreshError(_ client: CentrifugeClient, _ error: Error) {}
+    func onRefreshError(_ client: CentrifugeClient, _ error: Error?) {}
 }
 
 public protocol CentrifugeSubscriptionDelegate: class {
