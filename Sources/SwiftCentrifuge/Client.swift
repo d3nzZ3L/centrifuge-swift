@@ -242,6 +242,7 @@ internal extension CentrifugeClient {
             strongSelf.sendRefresh(token: token, completion: { result, error in
                 if let _ = error {
                     strongSelf.close(reason: "refresh error", reconnect: true)
+                    strongSelf.delegate?.onRefreshError(strongSelf, error)
                     return
                 }
                 if let res = result {
